@@ -18,7 +18,7 @@ export type GenericTicketMetadata = {
   portada?: string
   ticketid?: number
   tipoticket?: number
-  total?: string
+  total?: string | number
   url?: string
 }
 

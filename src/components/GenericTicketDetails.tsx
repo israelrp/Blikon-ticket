@@ -72,9 +72,20 @@ const QrCodeIcon = ({ size = 16, color = '#6C757D' }: IconProps) => (
   </svg>
 )
 
-const parseTotal = (total?: string): string => {
-  if (!total) return '$0.00'
-  return total.replace('¤', '$')
+const parseTotal = (total?: string | number | null): string => {
+  if (total === null || total === undefined) return '$0.00'
+
+  if (typeof total === 'number') {
+    // API sometimes returns a raw number instead of a formatted string.
+    if (!Number.isFinite(total)) return '$0.00'
+    return `$${total.toFixed(2)}`
+  }
+
+  const normalized = total.trim()
+  if (!normalized) return '$0.00'
+
+  // Some payloads use "¤" as currency placeholder.
+  return normalized.replaceAll('¤', '$')
 }
 
 const formatCurrency = (moneda?: string): string => {
