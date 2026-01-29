@@ -7,6 +7,7 @@ import {
   fetchTicket,
   type TicketUrlParams,
 } from './services/ticketService'
+import { setDocumentTitleAndMeta } from './utils/metaUtils'
 import './index.css' // Import Tailwind CSS
 
 function App() {
@@ -44,6 +45,19 @@ function App() {
 
     loadTicket()
   }, [])
+
+  // Update document title + meta tags when ticket loads
+  useEffect(() => {
+    if (!ticketDetails) return
+
+    const placeName = ticketDetails.metadata?.nombreplace || 'Ticket'
+    const folio = ticketDetails.metadata?.folio || ticketDetails.folio
+
+    const title = `${placeName}${folio ? ` — Folio ${folio}` : ''}`
+    const description = `${placeName}${folio ? ` • Folio ${folio}` : ''} • Ticket digital`
+
+    setDocumentTitleAndMeta({ title, description })
+  }, [ticketDetails])
 
   // Handle scroll for sticky header
   useEffect(() => {

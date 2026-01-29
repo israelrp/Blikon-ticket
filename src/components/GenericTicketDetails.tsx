@@ -165,8 +165,32 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
     }))
   }, [ticketDetails.secciones])
 
-  const handleShare = () => {
-    console.log('Share ticket:', ticketDetails)
+  const handleShare = async () => {
+    const placeName = metadata?.nombreplace ?? 'Ticket'
+    const folio = metadata?.folio ?? ticketDetails.folio
+    const title = `${placeName}${folio ? ` — Folio ${folio}` : ''}`
+    const textParts = [
+      formattedDateTime !== '--' ? formattedDateTime : null,
+      formattedTotal !== '$0.00' ? `Total ${formattedTotal} ${formattedCurrency}` : null,
+    ].filter(Boolean)
+    const text = textParts.length ? textParts.join(' • ') : 'Ticket digital'
+    const url = window.location.href
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text, url })
+        return
+      }
+    } catch {
+      // If user cancels share or platform rejects, fall back to clipboard below.
+    }
+
+    try {
+      await navigator.clipboard.writeText(url)
+      window.alert('Link copiado')
+    } catch {
+      window.prompt('Copia este link:', url)
+    }
   }
 
   const handleDownload = () => {
