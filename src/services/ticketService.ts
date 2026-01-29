@@ -12,7 +12,7 @@ export interface TicketUrlParams {
 
 /**
  * Extracts ticket parameters from the URL.
- * 
+ *
  * In production, parses from hostname pattern: {dominio}-ticket-{ticketId}-folio-{folio}.com.blog
  * For local development, uses query params: ?ticketId=39&folio=asdj6546532&dominio=cemex
  */
@@ -60,11 +60,11 @@ export async function fetchTicket(
   folio: string
 ): Promise<FetchTicketResult> {
   try {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+    const supabaseUrl = import.meta.env.VITE_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseAnonKey) {
-      console.error('VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY not configured')
+      console.error('VITE_PUBLIC_SUPABASE_URL or VITE_PUBLIC_SUPABASE_ANON_KEY not configured')
       return {
         success: false,
         ticket: null,
