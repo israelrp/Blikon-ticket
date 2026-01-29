@@ -1,8 +1,12 @@
 import type { GenericTicketDetailsData } from '../types/ticket'
 
 /**
- * URL Structure: {dominio}-ticket-{ticketId}-folio-{folio}.com.blog
- * Example: cemex-ticket-39-folio-asdj6546532.com.blog
+ * Supported URL structures:
+ * - Netlify (production): blikon-ticket.netlify.app/ticket-{ticketId}-folio-{folio}
+ *   Example: blikon-ticket.netlify.app/ticket-47-folio-7382
+ * - Legacy hostname: {dominio}-ticket-{ticketId}-folio-{folio}.com.blog
+ *   Example: cemex-ticket-39-folio-asdj6546532.com.blog
+ * - Query params (local/dev): ?ticketId=47&folio=7382&dominio=blikon
  */
 export interface TicketUrlParams {
   dominio: string | null
@@ -13,8 +17,10 @@ export interface TicketUrlParams {
 /**
  * Extracts ticket parameters from the URL.
  *
- * In production, parses from hostname pattern: {dominio}-ticket-{ticketId}-folio-{folio}.com.blog
- * For local development, uses query params: ?ticketId=39&folio=asdj6546532&dominio=cemex
+ * Priority:
+ * 1) Query params (useful for local/dev)
+ * 2) Netlify pathname formats
+ * 3) Legacy hostname format
  */
 export function extractTicketParamsFromUrl(): TicketUrlParams {
   // Allow query params for local testing: ?ticketId=39&folio=asdj6546532&dominio=cemex
@@ -30,8 +36,33 @@ export function extractTicketParamsFromUrl(): TicketUrlParams {
     }
   }
 
-  // Extract from hostname pattern: {dominio}-ticket-{ticketId}-folio-{folio}.com.blog
   const hostname = window.location.hostname
+  const pathname = window.location.pathname
+
+  // Netlify pathname formats:
+  // - /ticket-47-folio-7382
+  // - /ticket/47/folio/7382
+  const netlifyPathMatch =
+    pathname.match(/\/ticket-(\d+)-folio-([^/]+)\/?$/i) ||
+    pathname.match(/\/ticket\/(\d+)\/folio\/([^/]+)\/?$/i)
+
+  if (netlifyPathMatch) {
+    const [, id, folioRaw] = netlifyPathMatch
+    let decodedFolio = folioRaw
+    try {
+      decodedFolio = decodeURIComponent(folioRaw)
+    } catch {
+      // If it's already decoded or malformed, keep raw
+    }
+
+    return {
+      dominio: urlParams.get('dominio') || 'blikon',
+      ticketId: id,
+      folio: decodedFolio,
+    }
+  }
+
+  // Legacy hostname pattern: {dominio}-ticket-{ticketId}-folio-{folio}.com.blog
   const match = hostname.match(/^(.+?)-ticket-(\d+)-folio-(.+?)\.com\.blog$/i)
 
   if (match) {
@@ -112,9 +143,10 @@ export async function fetchTicket(
  * Used for creating shareable links.
  */
 export function generateTicketUrl(
-  dominio: string,
+  _dominio: string,
   ticketId: number | string,
   folio: string
 ): string {
-  return `https://${dominio}-ticket-${ticketId}-folio-${folio}.com.blog`
+  // Primary share URL (Netlify)
+  return `https://blikon-ticket.netlify.app/ticket-${ticketId}-folio-${encodeURIComponent(folio)}`
 }
