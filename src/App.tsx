@@ -134,10 +134,10 @@ function App() {
               <img
                 src={ticketDetails.metadata.icono}
                 alt={placeName}
-                className="min-w-[38px] max-w-[38px] h-[38px] ml-[9px] rounded-full bg-white object-cover"
+                className="min-w-[57px] max-w-[57px] h-[38px] ml-[9px] rounded-full bg-white object-cover"
               />
             ) : (
-              <EParkingLogo size="medium" className="min-w-[57px] max-w-[57px] h-[38px] ml-[9px] rounded-full bg-white shadow-none" />
+              <div className="min-w-[57px] max-w-[57px] h-[38px] ml-[9px] rounded-full bg-[#E2E2E2]" />
             )}
             <div className="ml-[9px] flex flex-col justify-center">
               <p className="text-[15px] font-bold text-black leading-tight">{placeName}</p>
