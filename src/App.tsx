@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { EParkingLogo } from './components/EParkingLogo'
 import { GenericTicketDetails } from './components/GenericTicketDetails'
 import type { GenericTicketDetailsData } from './types/ticket'
 import {
