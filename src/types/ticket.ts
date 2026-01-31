@@ -9,6 +9,11 @@ export type GenericTicketSection = {
   titulo?: string
 }
 
+export type GenericTicketHistorialItem = {
+  estatus: string
+  fecha: number
+}
+
 export type GenericTicketMetadata = {
   folio?: string
   horapagado?: string
@@ -20,6 +25,7 @@ export type GenericTicketMetadata = {
   tipoticket?: number
   total?: string | number
   url?: string
+  valueKind?: number
 }
 
 export type GenericTicketDetailsData = {
@@ -27,6 +33,7 @@ export type GenericTicketDetailsData = {
   fecha?: string
   fechafull?: number
   folio?: string
+  historial?: Record<string, GenericTicketHistorialItem>
   hora?: string
   metadata?: GenericTicketMetadata
   pago?: boolean

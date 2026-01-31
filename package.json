@@ -10,8 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.29.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-qr-code": "^2.0.18",
+    "rive-react": "^4.24.0",
     "supabase": "^2.72.9"
   },
   "devDependencies": {

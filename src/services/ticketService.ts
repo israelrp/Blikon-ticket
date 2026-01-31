@@ -150,3 +150,61 @@ export function generateTicketUrl(
   // Primary share URL (Netlify)
   return `https://blikon-ticket.netlify.app/ticket-${ticketId}-folio-${encodeURIComponent(folio)}`
 }
+
+export interface DownloadTicketResult {
+  success: boolean
+  data?: {
+    resultado: boolean
+    mensaje: string
+  }
+  error?: string
+}
+
+/**
+ * Downloads ticket PDF via Supabase Edge Function.
+ * The Edge Function calls the Interweb API to generate the PDF.
+ */
+export async function downloadTicket(ticketId: string): Promise<DownloadTicketResult> {
+  try {
+    const supabaseUrl = import.meta.env.VITE_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('VITE_PUBLIC_SUPABASE_URL or VITE_PUBLIC_SUPABASE_ANON_KEY not configured')
+      return {
+        success: false,
+        error: 'Error de configuración',
+      }
+    }
+
+    const response = await fetch(
+      `${supabaseUrl}/functions/v1/download-ticket?ticketId=${encodeURIComponent(ticketId)}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'apikey': supabaseAnonKey,
+        },
+      }
+    )
+
+    const data = await response.json()
+
+    if (!response.ok || !data.success) {
+      return {
+        success: false,
+        error: data.error || 'Error al descargar el ticket',
+      }
+    }
+
+    return {
+      success: true,
+      data: data.data,
+    }
+  } catch (error) {
+    console.error('Error downloading ticket:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al descargar el ticket',
+    }
+  }
+}
