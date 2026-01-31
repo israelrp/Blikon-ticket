@@ -15,6 +15,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [urlParams, setUrlParams] = useState<TicketUrlParams | null>(null)
+  const showUrlParams = Boolean(error && error.startsWith('URL inválida'))
 
   // Extract URL params and fetch ticket
   useEffect(() => {
@@ -104,7 +105,7 @@ function App() {
                   {error || 'Ticket no encontrado'}
                 </p>
               </div>
-              {urlParams && (
+              {showUrlParams && urlParams && (
                 <div className="text-[12px] text-[#ADB5BD] mt-2">
                   <p>ticketId: {urlParams.ticketId || 'no definido'}</p>
                   <p>folio: {urlParams.folio || 'no definido'}</p>
