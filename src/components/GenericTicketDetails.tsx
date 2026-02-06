@@ -47,14 +47,6 @@ const ExportIcon = ({ size = 14, color = '#6C757D' }: IconProps) => (
   </svg>
 )
 
-const HeadsetIcon = ({ size = 12, color = '#6C757D' }: IconProps) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <path d="M4 12V17C4 18.1 4.9 19 6 19H7" stroke={color} strokeWidth="1.6" />
-    <path d="M20 12V17C20 18.1 19.1 19 18 19H17" stroke={color} strokeWidth="1.6" />
-    <path d="M4 12C4 7.6 7.6 4 12 4C16.4 4 20 7.6 20 12" stroke={color} strokeWidth="1.6" />
-  </svg>
-)
-
 const QrCodeIcon = ({ size = 16 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
     <g clipPath="url(#clip0_1995_2803)">
@@ -784,6 +776,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
           </div>
         )}
 
+        {/*
         <button
           type="button"
           className="flex flex-row justify-between items-center w-full  h-[42px] px-[16px] rounded-[18px] bg-[#F8F9FA]"
@@ -794,6 +787,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
           </span>
           <CaretDownIcon size={12} color="#6C757D" />
         </button>
+        */}
       </div>
     </section>
   )
