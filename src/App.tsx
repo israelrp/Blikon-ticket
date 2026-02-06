@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { GenericTicketDetails } from './components/GenericTicketDetails'
 import type { GenericTicketDetailsData } from './types/ticket'
 import {
@@ -16,6 +16,24 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const [urlParams, setUrlParams] = useState<TicketUrlParams | null>(null)
   const showUrlParams = Boolean(error && error.startsWith('URL inválida'))
+  const [isUrlOverflowed, setIsUrlOverflowed] = useState(false)
+  const [urlScrollDistance, setUrlScrollDistance] = useState(0)
+  const urlContainerRef = useRef<HTMLDivElement | null>(null)
+  const urlTextRef = useRef<HTMLSpanElement | null>(null)
+  const hostname = window.location.hostname
+  const headerUrl =
+    'https://very-long-example-domain.example.com/tickets/2026/02/06/this/is/a/very/long/path/with/query?ticketId=1234567890&folio=ABCDEFGHIJKLMN1234567890'
+
+  const checkUrlOverflow = useCallback(() => {
+    const container = urlContainerRef.current
+    const text = urlTextRef.current
+
+    if (!container || !text) return
+
+    const overflow = Math.max(0, text.scrollWidth - container.clientWidth)
+    setIsUrlOverflowed(overflow > 0)
+    setUrlScrollDistance(overflow)
+  }, [])
 
   // Extract URL params and fetch ticket
   useEffect(() => {
@@ -69,6 +87,12 @@ function App() {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    checkUrlOverflow()
+    window.addEventListener('resize', checkUrlOverflow)
+    return () => window.removeEventListener('resize', checkUrlOverflow)
+  }, [checkUrlOverflow, hostname])
 
   // Loading state
   if (isLoading) {
@@ -125,11 +149,11 @@ function App() {
     <div className="min-h-screen bg-gray-100 flex justify-center px-2 pt-3 pb-4">
       <div className="w-full max-w-md">
         <section
-          className={`sticky top-3 z-10 flex items-center justify-between mb-[6px] mx-[9px] px-[8px] rounded-[31px] bg-white transition-shadow ${
+          className={`sticky top-3 z-10 flex items-center justify-between mb-[6px] mx-[9px] px-[8px] rounded-[31px] bg-white transition-shadow overflow-hidden ${
             isScrolled ? 'shadow-md' : 'shadow-none'
           }`}
         >
-          <div className="flex items-center h-[52px]">
+          <div className="flex items-center h-[52px] min-w-0 flex-1">
             {ticketDetails.metadata?.icono ? (
               <img
                 src={ticketDetails.metadata.icono}
@@ -139,11 +163,24 @@ function App() {
             ) : (
               <div className="min-w-[57px] max-w-[57px] h-[38px] ml-[9px] rounded-full bg-[#E2E2E2]" />
             )}
-            <div className="ml-[9px] flex flex-col justify-center">
+            <div className="ml-[9px] flex min-w-0 flex-col justify-center">
               <p className="text-[15px] font-bold text-black leading-tight">{placeName}</p>
-              <span className="text-[12px] text-[#989898] leading-tight">
-                {window.location.hostname}
-              </span>
+              <div
+                ref={urlContainerRef}
+                className="url-marquee max-w-full text-[12px] text-[#989898] leading-tight"
+              >
+                <span
+                  ref={urlTextRef}
+                  className={`url-marquee__text ${isUrlOverflowed ? 'is-animating' : ''}`}
+                  style={
+                    {
+                      '--url-marquee-distance': `${urlScrollDistance}px`,
+                    } as React.CSSProperties
+                  }
+                >
+                  {headerUrl}
+                </span>
+              </div>
             </div>
           </div>
         </section>

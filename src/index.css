@@ -18,3 +18,34 @@
 *::-webkit-scrollbar-track {
   background: transparent;
 }
+
+.url-marquee {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.url-marquee__text {
+  display: inline-block;
+  transform: translateX(0);
+  will-change: transform;
+}
+
+.url-marquee__text.is-animating {
+  animation: url-marquee-slide 16s ease-in-out infinite;
+}
+
+@keyframes url-marquee-slide {
+  0%,
+  10% {
+    transform: translateX(0);
+  }
+  45%,
+  55% {
+    transform: translateX(calc(-1 * var(--url-marquee-distance)));
+  }
+  90%,
+  100% {
+    transform: translateX(0);
+  }
+}
