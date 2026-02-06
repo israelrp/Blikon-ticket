@@ -21,8 +21,6 @@ function App() {
   const urlContainerRef = useRef<HTMLDivElement | null>(null)
   const urlTextRef = useRef<HTMLSpanElement | null>(null)
   const hostname = window.location.hostname
-  const headerUrl =
-    'https://very-long-example-domain.example.com/tickets/2026/02/06/this/is/a/very/long/path/with/query?ticketId=1234567890&folio=ABCDEFGHIJKLMN1234567890'
 
   const checkUrlOverflow = useCallback(() => {
     const container = urlContainerRef.current
@@ -178,7 +176,7 @@ function App() {
                     } as React.CSSProperties
                   }
                 >
-                  {headerUrl}
+                  {hostname}
                 </span>
               </div>
             </div>
