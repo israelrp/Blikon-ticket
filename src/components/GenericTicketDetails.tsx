@@ -377,7 +377,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
     <section className="relative h-full mx-[9px] mb-[6px] p-[10px] rounded-[17px] bg-white overflow-hidden">
       <div className="flex flex-col items-center gap-[7px]">
         {/* Ticket summary card */}
-        <div className="flex flex-col gap-[16px] w-full max-w-[393px] rounded-[10px] px-[9px] py-[9px] bg-[#F7F7F7]">
+        <div className="flex flex-col gap-[16px] w-full rounded-[10px] px-[9px] py-[9px] bg-[#F7F7F7]">
           {/* Header */}
           <div className="flex items-center gap-[8px]">
             <div className="flex items-center justify-center w-[30px] h-[30px] rounded-[9px] border border-[#F2F2F2] bg-white">
@@ -624,7 +624,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
 
         {/* Sections / Products cards */}
         {sections.map((section, index) => (
-          <div key={`${section.titulo ?? 'seccion'}-${index}`} className="flex flex-col gap-[16px] w-full max-w-[393px] rounded-[10px] px-[9px] py-[9px] bg-[#F7F7F7]">
+          <div key={`${section.titulo ?? 'seccion'}-${index}`} className="flex flex-col gap-[16px] w-full rounded-[10px] px-[9px] py-[9px] bg-[#F7F7F7]">
             {/* Header */}
             <div className="flex items-center gap-[8px]">
               <span className="font-inter-regular text-[16px] text-black">
@@ -653,7 +653,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
 
         {/* Loading / error states */}
         {isLoading && (
-          <div className="flex w-full max-w-[393px] justify-center py-[8px]">
+          <div className="flex w-full  justify-center py-[8px]">
             <span className="font-inter-regular text-[13px] text-[#6C757D]">
               Cargando detalles del ticket...
             </span>
@@ -661,7 +661,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
         )}
 
         {loadError && (
-          <div className="flex w-full max-w-[393px] justify-center py-[8px]">
+          <div className="flex w-full  justify-center py-[8px]">
             <span className="font-inter-regular text-[13px] text-[#A82424]">
               No se pudo cargar la informacion del ticket.
             </span>
@@ -669,7 +669,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
         )}
 
         {/* QR block */}
-        <div className="flex flex-col items-start gap-[8px] w-full max-w-[393px] rounded-[10px] px-[9px] py-[9px] bg-[#F7F7F7]">
+        <div className="flex flex-col items-start gap-[8px] w-full  rounded-[10px] px-[9px] py-[9px] bg-[#F7F7F7]">
           <div className="flex items-center gap-[6px]">
             <div className="flex items-center justify-center w-[30px] h-[30px] rounded-[9px] bg-white">
               <QrCodeIcon size={16} />
@@ -704,7 +704,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
 
         {/* Historial Section */}
         {hasHistorial && (
-          <div className="flex flex-col items-start w-full max-w-[393px] bg-[#F8F9FA] rounded-[18px] overflow-hidden">
+          <div className="flex flex-col items-start w-full  bg-[#F8F9FA] rounded-[18px] overflow-hidden">
             {/* Historial Header (Toggle) */}
             <button
               type="button"
@@ -786,7 +786,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
 
         <button
           type="button"
-          className="flex flex-row justify-between items-center w-full max-w-[393px] h-[42px] px-[16px] rounded-[18px] bg-[#F8F9FA]"
+          className="flex flex-row justify-between items-center w-full  h-[42px] px-[16px] rounded-[18px] bg-[#F8F9FA]"
         >
           <span className="flex items-center gap-[6px] font-inter-medium text-[14px] text-[#6C757D]">
             <HeadsetIcon size={12} color="#6C757D" />
