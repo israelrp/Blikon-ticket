@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { format } from 'date-fns'
 import QRCode from 'react-qr-code'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useRive } from 'rive-react'
 import type { GenericTicketDetailsData } from '../types/ticket'
 import { downloadTicket } from '../services/ticketService'
 
@@ -31,25 +30,6 @@ const CaretDownIcon = ({ size = 12, color = '#6C757D' }: IconProps) => (
   </svg>
 )
 
-const CheckCircleIcon = ({ size = 10, color = '#2CA824', weight = 'bold' }: IconProps) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth={weight === 'fill' ? '0' : '2'} fill={weight === 'fill' ? color : 'none'} />
-    <path d="M8 12L11 15L16 9" stroke={weight === 'fill' ? 'white' : color} strokeWidth="2" strokeLinecap="round" />
-  </svg>
-)
-
-const ClockIcon = ({ size = 10, color = '#BEA51A' }: IconProps) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="2" />
-    <path d="M12 7V12L15 14" stroke={color} strokeWidth="2" strokeLinecap="round" />
-  </svg>
-)
-
-const CurrencyDollarIcon = ({ size = 16, color = '#6C757D' }: IconProps) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-)
 
 const DownloadSimpleIcon = ({ size = 14, color = '#ADB5BD' }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
@@ -114,33 +94,6 @@ const TicketDetailsIcon = () => (
   </svg>
 )
 
-const MoneyBillIcon = () => (
-  <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
-    <path d="M19 0H1C0.447812 0 0 0.447812 0 1V11C0 11.5522 0.447812 12 1 12H19C19.5522 12 20 11.5522 20 11V1C20 0.447812 19.5522 0 19 0ZM1.5 10.5V8.5C2.60469 8.5 3.5 9.39531 3.5 10.5H1.5ZM1.5 3.5V1.5H3.5C3.5 2.60469 2.60469 3.5 1.5 3.5ZM10 9C8.61906 9 7.5 7.65656 7.5 6C7.5 4.34312 8.61938 3 10 3C11.3806 3 12.5 4.34312 12.5 6C12.5 7.65719 11.3803 9 10 9ZM18.5 10.5H16.5C16.5 9.39531 17.3953 8.5 18.5 8.5V10.5ZM18.5 3.5C17.3953 3.5 16.5 2.60469 16.5 1.5H18.5V3.5Z" fill="#6E6E6E"/>
-  </svg>
-)
-
-const PhoneIcon = () => (
-  <svg width="16" height="26" viewBox="0 0 16 26" fill="none">
-    <g clipPath="url(#clip0_32_1193)">
-      <path d="M14.427 0.820231C14.1154 0.534249 13.7494 0.313913 13.3508 0.17235C12.9522 0.0307864 12.5293 -0.029109 12.107 -0.00376858H3.66403C3.23977 -0.0299061 2.8146 0.0295751 2.41381 0.171135C2.01301 0.312694 1.64478 0.533439 1.33104 0.820231C1.04427 1.12488 0.822666 1.48483 0.679782 1.87807C0.536897 2.2713 0.47573 2.68955 0.500033 3.10723V22.2532C0.474603 22.6719 0.535227 23.0914 0.678149 23.4858C0.821071 23.8801 1.04327 24.241 1.33104 24.5462C1.6457 24.8313 2.01421 25.0505 2.41487 25.191C2.81554 25.3315 3.24026 25.3904 3.66403 25.3642H12.107C12.5288 25.3895 12.9513 25.3302 13.3497 25.1897C13.7481 25.0492 14.1144 24.8304 14.427 24.5462C14.7148 24.241 14.9369 23.8801 15.0799 23.4857C15.2228 23.0914 15.2834 22.6719 15.258 22.2532V3.10723C15.2822 2.68956 15.221 2.27134 15.0781 1.87813C14.9352 1.48491 14.7137 1.12495 14.427 0.820231ZM13.998 22.1062C14.0207 22.3799 13.9877 22.6554 13.9009 22.916C13.8141 23.1766 13.6754 23.4168 13.493 23.6222C13.0679 23.9809 12.5186 24.1577 11.964 24.1142H3.79804C3.24109 24.1601 2.68869 23.9832 2.26204 23.6222C2.08145 23.4159 1.94414 23.1754 1.85825 22.915C1.77236 22.6545 1.73965 22.3795 1.76204 22.1062V3.25323C1.73965 2.97993 1.77236 2.70492 1.85825 2.44451C1.94414 2.1841 2.08145 1.94358 2.26204 1.73723C2.68884 1.37666 3.24122 1.20008 3.79804 1.24623H5.31404C5.35018 1.24105 5.38703 1.24435 5.42166 1.25588C5.4563 1.26742 5.48778 1.28686 5.5136 1.31268C5.53941 1.33849 5.55886 1.36997 5.57039 1.40461C5.58192 1.43924 5.58522 1.47609 5.58003 1.51223V1.69623C5.57149 1.89391 5.64078 2.08706 5.77304 2.23423C5.84088 2.30392 5.92279 2.35834 6.01332 2.39386C6.10385 2.42938 6.20091 2.44519 6.29804 2.44023H9.47605C9.57198 2.44394 9.66763 2.42752 9.75684 2.39205C9.84605 2.35657 9.92685 2.30281 9.99404 2.23423C10.0615 2.16236 10.1139 2.07776 10.1482 1.98538C10.1826 1.893 10.1981 1.7947 10.194 1.69623V1.51223C10.194 1.3349 10.2784 1.24623 10.447 1.24623H11.963C12.5176 1.20279 13.0669 1.37955 13.492 1.73823C13.6743 1.94365 13.8131 2.18391 13.8999 2.44448C13.9867 2.70505 14.0197 2.98052 13.997 3.25423L13.998 22.1062Z" fill="#007AFF"/>
-      <g opacity="0.1">
-        <mask id="mask0_32_1193" maskUnits="userSpaceOnUse" x="1" y="1" width="13" height="24">
-          <path d="M13.9949 1.24609H1.76294V24.1141H13.9949V1.24609Z" fill="white"/>
-        </mask>
-        <g mask="url(#mask0_32_1193)">
-          <path d="M3.79691 24.1139H11.9599C12.5145 24.1573 13.0638 23.9806 13.4889 23.6219C13.6712 23.4165 13.81 23.1762 13.8968 22.9156C13.9836 22.6551 14.0166 22.3796 13.9939 22.1059V3.2539C14.0166 2.98019 13.9836 2.70472 13.8968 2.44415C13.81 2.18358 13.6712 1.94332 13.4889 1.7379C13.0638 1.37922 12.5145 1.20246 11.9599 1.2459H10.4439C10.2752 1.2459 10.1909 1.33456 10.1909 1.5119V1.6979C10.195 1.79637 10.1795 1.89467 10.1451 1.98705C10.1108 2.07943 10.0584 2.16403 9.99091 2.2359C9.92368 2.30443 9.84289 2.35815 9.75368 2.39362C9.66448 2.4291 9.56885 2.44554 9.47292 2.4419H6.29592C6.1988 2.44686 6.10174 2.43105 6.01121 2.39552C5.92068 2.36 5.83876 2.30558 5.77093 2.2359C5.63867 2.08873 5.56937 1.89558 5.57792 1.6979V1.5119C5.5831 1.47576 5.57981 1.43891 5.56827 1.40427C5.55674 1.36963 5.53728 1.33816 5.51147 1.31234C5.48565 1.28653 5.45418 1.26708 5.41955 1.25555C5.38491 1.24402 5.34806 1.24071 5.31193 1.2459H3.79592C3.23897 1.20002 2.68657 1.37696 2.25992 1.7379C2.07929 1.94422 1.94195 2.18473 1.85605 2.44515C1.77016 2.70557 1.73747 2.9806 1.75992 3.2539V22.1069C1.73747 22.3802 1.77016 22.6552 1.85605 22.9156C1.94195 23.1761 2.07929 23.4166 2.25992 23.6229C2.68657 23.9838 3.23897 24.1608 3.79592 24.1149" fill="#007AFF"/>
-        </g>
-      </g>
-      <path d="M5.32605 23.2503C5.2672 23.2514 5.20871 23.2407 5.15397 23.2191C5.09923 23.1975 5.0493 23.1653 5.00705 23.1243C4.9641 23.0846 4.93005 23.0363 4.90713 22.9826C4.88421 22.9288 4.87293 22.8708 4.87405 22.8123C4.8719 22.7517 4.88263 22.6912 4.90556 22.635C4.92849 22.5788 4.96308 22.5281 5.00705 22.4863C5.04927 22.4453 5.09919 22.413 5.15394 22.3914C5.20869 22.3698 5.26719 22.3592 5.32605 22.3603H10.445C10.5041 22.3576 10.5631 22.3674 10.6181 22.3891C10.6731 22.4108 10.7228 22.4439 10.764 22.4863C10.8457 22.5748 10.8888 22.692 10.884 22.8123C10.887 22.9281 10.8438 23.0403 10.764 23.1243C10.7228 23.1666 10.673 23.1997 10.618 23.2214C10.563 23.2432 10.5041 23.253 10.445 23.2503H5.32605Z" fill="#007AFF"/>
-    </g>
-    <defs>
-      <clipPath id="clip0_32_1193">
-        <rect width="14.758" height="25.368" fill="white" transform="translate(0.5 -0.00390625)"/>
-      </clipPath>
-    </defs>
-  </svg>
-)
 
 const TimelineDotIcon = ({ color }: { color: string }) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -241,21 +194,15 @@ const copyTextToClipboard = async (text: string): Promise<boolean> => {
   }
 }
 
+const getStatusConfig = (cadenaestatus?: string, horapagado?: string) => {
+  // Use cadenaestatus if available
+  if (cadenaestatus) {
+    return { text: cadenaestatus }
+  }
 
-
-const getStatusConfig = (estatus: number, horapagado?: string) => {
+  // Fallback to horapagado check
   const isPaid = Boolean(horapagado && horapagado.trim() !== '')
-  if (isPaid || estatus === 2) {
-    return {
-      text: 'Pagado',
-      icon: <CheckCircleIcon size={10} weight="bold" color="#2CA824" />,
-    }
-  }
-
-  return {
-    text: 'Sin pagar',
-    icon: <ClockIcon size={10} weight="bold" color="#BEA51A" />,
-  }
+  return { text: isPaid ? 'Pagado' : 'Sin pagar' }
 }
 
 const getTicketTypeLabel = (tipoticket?: number): string => {
@@ -271,23 +218,13 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
   loadError = false,
 }) => {
   const [isHistorialExpanded, setIsHistorialExpanded] = useState(true)
-  const [selectedTipPercentage, setSelectedTipPercentage] = useState<number | null>(null)
-  const [isProcessingPayment] = useState(false)
-  const [paymentCompleted] = useState(false)
-  const [paymentStatus] = useState<boolean | null>(null)
+  const [isFolioExpanded, setIsFolioExpanded] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadCompleted, setDownloadCompleted] = useState(false)
   const [downloadSuccess, setDownloadSuccess] = useState<boolean | null>(null)
 
-  const { RiveComponent } = useRive({
-    src: '/animations/loader-pagos-v3.riv',
-    stateMachines: 'State Machine 1',
-    autoplay: true,
-  })
-
   const metadata = ticketDetails.metadata
-  const statusValue = ticketDetails.status ?? ticketDetails.estatus ?? 1
-  const statusConfig = getStatusConfig(statusValue, metadata?.horapagado)
+  const statusConfig = getStatusConfig(ticketDetails.cadenaestatus, metadata?.horapagado)
   const formattedDateTime = formatDateTime({
     fecha: ticketDetails.fecha,
     hora: ticketDetails.hora,
@@ -297,12 +234,34 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
   const formattedCurrency = formatCurrency(metadata?.moneda)
   const qrUrl = ticketDetails.metadata?.url
 
+  // Folio value and truncation logic
+  const folioValue = metadata?.folio ?? ticketDetails.folio
+  const shouldTruncateFolio = folioValue && folioValue.length > 20
+
+  const handleFolioClick = useCallback(() => {
+    if (shouldTruncateFolio) {
+      setIsFolioExpanded(!isFolioExpanded)
+    }
+  }, [shouldTruncateFolio, isFolioExpanded])
+
+  // Normalize sections for rendering — sort items so "Total" appears at the bottom
   const sections = useMemo(() => {
     if (!ticketDetails.secciones) return []
-    return Object.values(ticketDetails.secciones).map((section) => ({
-      ...section,
-      items: section.items ? Object.values(section.items) : [],
-    }))
+    return Object.values(ticketDetails.secciones).map((section) => {
+      const items = section.items ? Object.values(section.items) : []
+      // Sort items so that "Total" appears at the bottom
+      const sortedItems = [...items].sort((a, b) => {
+        const aIsTotal = a.nombre?.toLowerCase().includes('total') ?? false
+        const bIsTotal = b.nombre?.toLowerCase().includes('total') ?? false
+        if (aIsTotal && !bIsTotal) return 1
+        if (!aIsTotal && bIsTotal) return -1
+        return 0
+      })
+      return {
+        ...section,
+        items: sortedItems,
+      }
+    })
   }, [ticketDetails.secciones])
 
   const historialEntries = useMemo(() => {
@@ -318,20 +277,9 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
 
   const hasHistorial = historialEntries.length > 0
 
-  const totalAmount = (() => {
-    const total = metadata?.total
-    if (total === null || total === undefined) return 0
-    const totalText = typeof total === 'string' ? total : String(total)
-    const numeric = totalText.replace(/[^0-9.,-]/g, '').replace(/,/g, '')
-    const parsed = Number.parseFloat(numeric)
-    return Number.isFinite(parsed) ? parsed : 0
-  })()
-
-  const tipAmount = selectedTipPercentage !== null ? (totalAmount * selectedTipPercentage) / 100 : 0
-  const totalWithTip = totalAmount + tipAmount
-  const formattedTotalWithTip = `${getCurrencySymbol(metadata?.moneda)}${totalWithTip.toFixed(2)}`
-
-  const showPaymentSection = ticketDetails.pago === true
+  // Check if this is a check-in ticket (type 2) — no total for these
+  const tipoticket = metadata?.tipoticket ?? ticketDetails.tipoticket
+  const isCheckInTicket = tipoticket === 2
 
   const handleShare = async () => {
     if (!qrUrl) return
@@ -426,34 +374,11 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
   }
 
   return (
-    <section className="relative mx-[9px] mb-[6px] p-[10px] rounded-[17px] bg-white">
-      {isProcessingPayment && (
-        <div className="absolute inset-0 z-20 flex justify-center items-center bg-black/70 backdrop-blur-md rounded-[17px]">
-          <div className="flex flex-col justify-center items-center gap-y-[12px] w-[154px] h-[157px] mb-[2px] p-[10px] rounded-[10px] bg-white/70">
-            <RiveComponent />
-            <AnimatePresence mode="wait">
-              <motion.h2
-                key={paymentCompleted ? 'result-title' : 'loading-title'}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                className="text-[17px] font-semibold text-black leading-[22px] tracking-[-0.408px]"
-              >
-                {paymentCompleted
-                  ? paymentStatus === true
-                    ? 'Pago exitoso'
-                    : 'Pago rechazado'
-                  : 'Procesando...'}
-              </motion.h2>
-            </AnimatePresence>
-          </div>
-        </div>
-      )}
-
-
+    <section className="relative h-full mx-[9px] mb-[6px] p-[10px] rounded-[17px] bg-white overflow-hidden">
       <div className="flex flex-col items-center gap-[7px]">
+        {/* Ticket summary card */}
         <div className="flex flex-col gap-[16px] w-full max-w-[393px] rounded-[10px] px-[9px] py-[9px] bg-[#F7F7F7]">
+          {/* Header */}
           <div className="flex items-center gap-[8px]">
             <div className="flex items-center justify-center w-[30px] h-[30px] rounded-[9px] border border-[#F2F2F2] bg-white">
               <TicketDetailsIcon />
@@ -461,20 +386,34 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
             <span className="font-inter-regular text-[16px] text-black">Ticket</span>
           </div>
 
+          {/* Core fields */}
           <div className="flex flex-col gap-[8px]">
             <span className="font-inter-tight font-inter-semibold text-[16px] leading-[100%] text-[#2B333B]">
               {metadata?.nombreplace ?? 'Ticket'}
             </span>
             <div className="flex flex-col items-center px-[10px] py-[8px] gap-[24px] rounded-[10px] bg-[#FCFCFC]">
-              <div className="flex flex-col items-start w-full">
+              {/* Folio */}
+              <div
+                className={`flex flex-col items-start w-full overflow-hidden ${shouldTruncateFolio ? 'cursor-pointer' : ''}`}
+                onClick={handleFolioClick}
+              >
                 <span className="font-inter-semibold text-[11px] leading-[13px] tracking-[0.06em] uppercase text-[#ADB5BD]">
                   Folio
                 </span>
-                <span className="font-inter-regular text-[18px] leading-[22px] text-[#495057]">
-                  {metadata?.folio ?? ticketDetails.folio}
+                <span
+                  className={`font-inter-regular text-[18px] leading-[22px] text-[#495057] w-full transition-all duration-500 ease-in-out ${
+                    shouldTruncateFolio && !isFolioExpanded ? 'truncate' : 'break-all'
+                  }`}
+                  style={{
+                    maxHeight: shouldTruncateFolio && !isFolioExpanded ? '22px' : '200px',
+                    opacity: 1,
+                  }}
+                >
+                  {folioValue}
                 </span>
               </div>
 
+              {/* Tipo */}
               <div className="flex flex-row items-start gap-[8px] w-full">
                 <div className="flex flex-col items-start flex-1">
                   <span className="font-inter-semibold text-[11px] leading-[13px] tracking-[0.06em] uppercase text-[#ADB5BD]">
@@ -486,6 +425,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
                 </div>
               </div>
 
+              {/* Fecha + Estatus */}
               <div className="flex flex-row items-start gap-[8px] w-full">
                 <div className="flex flex-col items-start flex-1">
                   <span className="font-inter-semibold text-[11px] leading-[13px] tracking-[0.06em] uppercase text-[#ADB5BD]">
@@ -499,73 +439,32 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
                   <span className="font-inter-semibold text-[11px] leading-[13px] tracking-[0.06em] uppercase text-[#ADB5BD]">
                     Estatus
                   </span>
+                  <span className="font-inter-regular text-[13px] leading-[16px] text-[#495057]">
+                    {statusConfig.text}
+                  </span>
+                </div>
+              </div>
+
+              {/* Total — hidden for check-in tickets (type 2) */}
+              {!isCheckInTicket && (
+                <div className="flex flex-col items-start w-full">
+                  <span className="font-inter-semibold text-[11px] leading-[13px] tracking-[0.06em] uppercase text-[#ADB5BD]">
+                    Total
+                  </span>
                   <div className="flex flex-row items-center gap-[4px]">
-                    {statusConfig.icon}
-                    <span className="font-inter-regular text-[13px] leading-[16px] text-[#495057]">
-                      {statusConfig.text}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col items-start w-full">
-                <span className="font-inter-semibold text-[11px] leading-[13px] tracking-[0.06em] uppercase text-[#ADB5BD]">
-                  Total
-                </span>
-                <div className="flex flex-row items-center gap-[4px]">
-                  <span className="font-inter-semibold text-[18px] leading-[22px] text-[#2B333B]">
-                    {formattedTotal}
-                  </span>
-                  <span className="font-inter-medium text-[11px] leading-[13px] tracking-[0.06em] text-[#ADB5BD]">
-                    {formattedCurrency}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {sections.length > 0 && (
-            <div className="flex flex-col items-end gap-[8px] w-full rounded-[10px] px-[10px] py-[8px] bg-[#FCFCFC]">
-              {sections.map((section, index) => (
-                <div key={`${section.titulo ?? 'seccion'}-${index}`} className="w-full">
-                  <div className="flex flex-col gap-[4px]">
-                    <span className="font-inter-semibold text-[11px] leading-[13px] tracking-[0.12em] uppercase text-[#ADB5BD]">
-                      {section.titulo ?? 'Productos'} ({section.items?.length ?? 0})
-                    </span>
-                    <div className="flex flex-col gap-[4px]">
-                      {section.items?.map((item, itemIndex) => (
-                        <div
-                          key={`${item.nombre ?? 'item'}-${itemIndex}`}
-                          className="flex items-start gap-[8px]"
-                        >
-                          <span className="flex-1 font-inter-regular text-[13px] leading-[16px] text-[#495057]">
-                            {item.nombre}
-                          </span>
-                          <span className="font-inter-regular text-[13px] leading-[16px] text-[#495057] text-right">
-                            {item.valor}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="w-full border-t border-[#E9ECEF] my-[8px]" />
-                  <div className="flex items-center gap-[8px] w-full">
-                    <span className="flex-1 font-inter-semibold text-[13px] leading-[16px] text-[#2B333B]">
-                      Total
-                    </span>
-                    <span className="font-inter-semibold text-[13px] leading-[16px] text-[#2B333B]">
+                    <span className="font-inter-semibold text-[18px] leading-[22px] text-[#2B333B]">
                       {formattedTotal}
                     </span>
-                    <span className="font-inter-medium text-[11px] leading-[13px] text-[#ADB5BD]">
+                    <span className="font-inter-medium text-[11px] leading-[13px] tracking-[0.06em] text-[#ADB5BD]">
                       {formattedCurrency}
                     </span>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
-          )}
+          </div>
 
+          {/* Primary actions */}
           <div className="flex flex-col items-start gap-[8px] w-full">
             <div className="flex flex-row items-start gap-[8px] w-full">
               <button
@@ -723,106 +622,36 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
           </div>
         </div>
 
-        {showPaymentSection && (
-          <div className="flex flex-col items-center gap-[16px] w-full max-w-[393px] rounded-[10px] px-[9px] py-[9px] bg-[#F7F7F7]">
-            <div className="flex items-center gap-[6px] w-full">
-              <div className="flex items-center justify-center w-[30px] h-[30px] rounded-[9px] bg-white">
-                <MoneyBillIcon />
-              </div>
+        {/* Sections / Products cards */}
+        {sections.map((section, index) => (
+          <div key={`${section.titulo ?? 'seccion'}-${index}`} className="flex flex-col gap-[16px] w-full max-w-[393px] rounded-[10px] px-[9px] py-[9px] bg-[#F7F7F7]">
+            {/* Header */}
+            <div className="flex items-center gap-[8px]">
               <span className="font-inter-regular text-[16px] text-black">
-                Selecciona el método de pago
+                {section.titulo ?? 'Productos'}
               </span>
             </div>
 
-            <div className="flex items-center gap-[8px] w-full">
-              <button
-                type="button"
-                className="flex flex-col justify-center items-center w-full h-[48px] bg-white border border-[#007AFF] rounded-[14px]"
-              >
-                <div className="flex items-center gap-[9px]">
-                  <PhoneIcon />
-                  <span className="font-inter-regular text-[13px] text-black">En aplicación</span>
-                </div>
-              </button>
-            </div>
-
-            <div className="flex flex-col items-start gap-[8px] w-full">
-              <div className="flex items-center gap-[6px] w-full">
-                <div className="flex items-center justify-center w-[30px] h-[30px] rounded-[9px] bg-white">
-                  <CurrencyDollarIcon size={16} color="#6C757D" />
-                </div>
-                <span className="font-inter-regular text-[16px] text-black">Propina</span>
-              </div>
-
-              <div className="flex items-start gap-[8px] w-full">
-                {[0, 5, 10, 15].map((percentage) => {
-                  const tipValue = (totalAmount * percentage) / 100
-                  const isSelected = selectedTipPercentage === percentage
-                  return (
-                    <button
-                      key={percentage}
-                      type="button"
-                      onClick={() => setSelectedTipPercentage(percentage)}
-                      className={`flex flex-col justify-center items-center py-[10px] px-[8px] gap-[2px] flex-1 h-[54px] rounded-[14px] border transition-all duration-300 ease-out overflow-hidden ${
-                        isSelected
-                          ? 'bg-[rgba(2,122,255,0.05)] border-[#027AFF] scale-[1.02]'
-                          : 'bg-white border-[#E9ECEF] hover:border-[#027AFF] hover:bg-[rgba(2,122,255,0.02)] active:scale-[0.98]'
-                      }`}
-                    >
-                      <span
-                        className={`font-inter-semibold text-[16px] leading-[19px] transition-colors duration-300 ease-out ${
-                          isSelected ? 'text-[#027AFF]' : 'text-[#495057]'
-                        }`}
-                      >
-                        {percentage}%
-                      </span>
-                      <AnimatePresence mode="wait">
-                        <motion.span
-                          key={`${percentage}-${tipValue.toFixed(2)}`}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          transition={{ duration: 0.2, ease: 'easeOut' }}
-                          className="font-inter-regular text-[12px] leading-[15px] text-[#6C757D]"
-                        >
-                          ${tipValue.toFixed(2)}
-                        </motion.span>
-                      </AnimatePresence>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              disabled={selectedTipPercentage === null || isProcessingPayment}
-              className={`flex items-center justify-center gap-[6px] w-full h-[44px] rounded-[22px] bg-[#027AFF] transition-all duration-300 ease-out overflow-hidden ${
-                selectedTipPercentage !== null && !isProcessingPayment
-                  ? 'opacity-100 cursor-pointer hover:scale-[1.01] active:scale-[0.99]'
-                  : 'opacity-50 cursor-not-allowed'
-              }`}
-            >
-              <CheckCircleIcon size={16} weight="fill" color="#F8F9FA" />
-              <span className="font-inter-tight font-semibold text-[14px] leading-[100%] text-center text-[#F8F9FA]">
-                Pagar
-              </span>
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={formattedTotalWithTip}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.25, ease: 'easeOut' }}
-                  className="font-inter-tight font-semibold text-[14px] leading-[100%] text-center text-[#F8F9FA]"
+            {/* Items list */}
+            <div className="flex flex-col gap-[4px] w-full">
+              {section.items?.map((item, itemIndex) => (
+                <div
+                  key={`${item.nombre ?? 'item'}-${itemIndex}`}
+                  className="flex items-start gap-[8px]"
                 >
-                  {formattedTotalWithTip} {formattedCurrency}
-                </motion.span>
-              </AnimatePresence>
-            </button>
+                  <span className="flex-1 font-inter-regular text-[13px] leading-[16px] text-[#495057]">
+                    {item.nombre}
+                  </span>
+                  <span className="font-inter-regular text-[13px] leading-[16px] text-[#495057] text-right">
+                    {item.valor}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
+        ))}
 
+        {/* Loading / error states */}
         {isLoading && (
           <div className="flex w-full max-w-[393px] justify-center py-[8px]">
             <span className="font-inter-regular text-[13px] text-[#6C757D]">
@@ -839,6 +668,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
           </div>
         )}
 
+        {/* QR block */}
         <div className="flex flex-col items-start gap-[8px] w-full max-w-[393px] rounded-[10px] px-[9px] py-[9px] bg-[#F7F7F7]">
           <div className="flex items-center gap-[6px]">
             <div className="flex items-center justify-center w-[30px] h-[30px] rounded-[9px] bg-white">
@@ -872,8 +702,10 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
           </div>
         </div>
 
+        {/* Historial Section */}
         {hasHistorial && (
           <div className="flex flex-col items-start w-full max-w-[393px] bg-[#F8F9FA] rounded-[18px] overflow-hidden">
+            {/* Historial Header (Toggle) */}
             <button
               type="button"
               onClick={() => setIsHistorialExpanded(!isHistorialExpanded)}
@@ -891,6 +723,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
               </div>
             </button>
 
+            {/* Historial Content (Expandable with Animation) */}
             <div
               className="grid transition-all duration-300 ease-out overflow-hidden"
               style={{
@@ -899,7 +732,9 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
             >
               <div className="min-h-0">
                 <div className="flex flex-col items-start px-[16px] pb-[14px] gap-[16px] w-full">
+                  {/* Timeline */}
                   <div className="relative flex flex-col gap-[8px] w-full">
+                    {/* Vertical line connector */}
                     {historialEntries.length > 1 && (
                       <div
                         className="absolute left-[12px] top-[12px] w-px bg-[#DCDCDC] z-0"
@@ -917,14 +752,18 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
                           key={entry.id}
                           className="flex flex-row items-center gap-[8px] w-full min-h-[30px] relative z-10"
                         >
+                          {/* Timeline Point */}
                           <div className="shrink-0">
                             <TimelineDotIcon color={pointColor} />
                           </div>
 
+                          {/* Content */}
                           <div className="flex flex-col items-start gap-[2px] flex-1">
+                            {/* Date/Time */}
                             <span className="font-inter-semibold text-[11px] leading-[13px] tracking-[0.06em] uppercase text-[#ADB5BD]">
                               {formatHistorialDateTime(entry.fecha)}
                             </span>
+                            {/* Status */}
                             <span
                               className="font-inter-medium text-[14px] leading-[17px]"
                               style={{
