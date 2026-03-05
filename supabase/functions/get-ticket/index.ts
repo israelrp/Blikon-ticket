@@ -111,7 +111,9 @@ serve(async (req) => {
 
     // Validate folio matches
     const actualFolio = ticketData.folio || ticketData.metadata?.folio
-    if (actualFolio !== folio) {
+    const normalizedActualFolio = actualFolio?.toLowerCase()
+    const normalizedFolio = folio.toLowerCase()
+    if (normalizedActualFolio !== normalizedFolio) {
       return new Response(
         JSON.stringify({
           success: false,
