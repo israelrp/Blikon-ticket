@@ -59,10 +59,10 @@ serve(async (req) => {
     }
 
     // Get Firebase config from secrets
-    const firebaseDatabaseUrl = Deno.env.get('VITE_FIREBASE_DATABASE_URL')
+    const firebaseDatabaseUrl = Deno.env.get('FIREBASE_DATABASE_URL_TEST')
     
     if (!firebaseDatabaseUrl) {
-      console.error('VITE_FIREBASE_DATABASE_URL not configured')
+      console.error('FIREBASE_DATABASE_URL_TEST not configured')
       return new Response(
         JSON.stringify({
           success: false,
@@ -111,9 +111,7 @@ serve(async (req) => {
 
     // Validate folio matches
     const actualFolio = ticketData.folio || ticketData.metadata?.folio
-    const normalizedActualFolio = actualFolio?.toLowerCase()
-    const normalizedFolio = folio.toLowerCase()
-    if (normalizedActualFolio !== normalizedFolio) {
+    if (actualFolio !== folio) {
       return new Response(
         JSON.stringify({
           success: false,
