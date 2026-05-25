@@ -109,9 +109,10 @@ serve(async (req) => {
       )
     }
 
-    // Validate folio matches
+    // Validate folio matches (case-insensitive)
     const actualFolio = ticketData.folio || ticketData.metadata?.folio
-    if (actualFolio !== folio) {
+    const normalizeFolio = (value: string) => value.trim().toLowerCase()
+    if (!actualFolio || normalizeFolio(actualFolio) !== normalizeFolio(folio)) {
       return new Response(
         JSON.stringify({
           success: false,
