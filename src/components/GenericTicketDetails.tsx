@@ -3,12 +3,16 @@ import { format } from 'date-fns'
 import QRCode from 'react-qr-code'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { GenericTicketDetailsData } from '../types/ticket'
+import type { AuthStatus } from '../auth/useAuth'
+import type { BlikonUser } from '../auth/getUser'
 import { downloadTicket } from '../services/ticketService'
 
 interface GenericTicketDetailsProps {
   ticketDetails: GenericTicketDetailsData
   isLoading?: boolean
   loadError?: boolean
+  authStatus?: AuthStatus
+  authUser?: BlikonUser | null
 }
 
 type IconProps = React.SVGProps<SVGSVGElement> & {
@@ -204,10 +208,20 @@ const getTicketTypeLabel = (tipoticket?: number): string => {
   return `Tipo ${tipoticket}`
 }
 
+const isTicketPaid = (ticketDetails: GenericTicketDetailsData): boolean => {
+  const horapagado = ticketDetails.metadata?.horapagado
+  if (horapagado && horapagado.trim() !== '') return true
+
+  const status = ticketDetails.cadenaestatus?.trim().toLowerCase()
+  return status === 'pagado'
+}
+
 export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
   ticketDetails,
   isLoading = false,
   loadError = false,
+  authStatus = 'loading',
+  authUser = null,
 }) => {
   const [isHistorialExpanded, setIsHistorialExpanded] = useState(true)
   const [isFolioExpanded, setIsFolioExpanded] = useState(false)
@@ -272,6 +286,11 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
   // Check if this is a check-in ticket (type 2) — no total for these
   const tipoticket = metadata?.tipoticket ?? ticketDetails.tipoticket
   const isCheckInTicket = tipoticket === 2
+  const showPagarButton =
+    authStatus === 'authenticated' &&
+    authUser !== null &&
+    !isCheckInTicket &&
+    !isTicketPaid(ticketDetails)
 
   const handleShare = async () => {
     if (!qrUrl) return
@@ -611,6 +630,16 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
                 </AnimatePresence>
               </button>
             </div>
+            {showPagarButton && (
+              <button
+                type="button"
+                className="flex flex-row justify-center items-center p-[11px_16px] gap-[6px] w-full h-[36px] bg-[#027AFF] rounded-[18px] hover:bg-[#0266D6] transition-colors"
+              >
+                <span className="font-inter-medium text-[14px] leading-[100%] text-center tracking-[-0.01em] text-white">
+                  Pagar
+                </span>
+              </button>
+            )}
           </div>
         </div>
 

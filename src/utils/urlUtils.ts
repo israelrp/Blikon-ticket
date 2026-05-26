@@ -1,5 +1,5 @@
 export function getLoginBaseUrl(): string {
-  return 'https://validacel.com.blog'
+  return import.meta.env.VITE_BLIKON_LOGIN_URL ?? 'http://localhost:3001'
 }
 
 export function buildTicketOriginUrl(ticketId: number | string): string {

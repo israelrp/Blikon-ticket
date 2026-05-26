@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useAuth } from './auth/useAuth'
 import { GenericTicketDetails } from './components/GenericTicketDetails'
 import type { GenericTicketDetailsData } from './types/ticket'
 import {
@@ -10,6 +11,7 @@ import { setDocumentTitleAndMeta } from './utils/metaUtils'
 import './index.css' // Import Tailwind CSS
 
 function App() {
+  const { status: authStatus, user: authUser } = useAuth()
   const [isScrolled, setIsScrolled] = useState(false)
   const [ticketDetails, setTicketDetails] = useState<GenericTicketDetailsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -183,7 +185,11 @@ function App() {
           </div>
         </section>
 
-        <GenericTicketDetails ticketDetails={ticketDetails} />
+        <GenericTicketDetails
+          ticketDetails={ticketDetails}
+          authStatus={authStatus}
+          authUser={authUser}
+        />
       </div>
     </div>
   )
