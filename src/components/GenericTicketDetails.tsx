@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import type { GenericTicketDetailsData } from '../types/ticket'
 import type { AuthStatus } from '../auth/useAuth'
 import type { BlikonUser } from '../auth/getUser'
+import { PaymentSection } from './payment/PaymentSection'
 import { downloadTicket } from '../services/ticketService'
 
 interface GenericTicketDetailsProps {
@@ -13,6 +14,7 @@ interface GenericTicketDetailsProps {
   loadError?: boolean
   authStatus?: AuthStatus
   authUser?: BlikonUser | null
+  onPaymentComplete?: () => void
 }
 
 type IconProps = React.SVGProps<SVGSVGElement> & {
@@ -222,6 +224,7 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
   loadError = false,
   authStatus = 'loading',
   authUser = null,
+  onPaymentComplete,
 }) => {
   const [isHistorialExpanded, setIsHistorialExpanded] = useState(true)
   const [isFolioExpanded, setIsFolioExpanded] = useState(false)
@@ -630,18 +633,16 @@ export const GenericTicketDetails: React.FC<GenericTicketDetailsProps> = ({
                 </AnimatePresence>
               </button>
             </div>
-            {showPagarButton && (
-              <button
-                type="button"
-                className="flex flex-row justify-center items-center p-[11px_16px] gap-[6px] w-full h-[36px] bg-[#027AFF] rounded-[18px] hover:bg-[#0266D6] transition-colors"
-              >
-                <span className="font-inter-medium text-[14px] leading-[100%] text-center tracking-[-0.01em] text-white">
-                  Pagar
-                </span>
-              </button>
-            )}
           </div>
         </div>
+
+        {showPagarButton && authUser && (
+          <PaymentSection
+            ticketDetails={ticketDetails}
+            authUser={authUser}
+            onPaymentComplete={onPaymentComplete}
+          />
+        )}
 
         {/* Sections / Products cards */}
         {sections.map((section, index) => (

@@ -7,6 +7,9 @@ interface ImportMetaEnv {
   readonly VITE_BLIKON_API_URL?: string
   readonly VITE_BLIKON_API_JWT?: string
   readonly VITE_BLIKON_LOGIN_URL?: string
+  readonly VITE_BLIKON_INTERWEB_API_URL?: string
+  readonly VITE_BLIKON_INTERWEB_API_JWT?: string
+  readonly VITE_CONEKTA_PUBLIC_KEY?: string
 }
 
 interface ImportMeta {

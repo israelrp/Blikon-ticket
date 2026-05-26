@@ -35,6 +35,16 @@ function App() {
     setUrlScrollDistance(overflow)
   }, [])
 
+  const reloadTicket = useCallback(async () => {
+    const params = extractTicketParamsFromUrl()
+    if (!params.ticketId || !params.folio) return
+
+    const result = await fetchTicket(params.ticketId, params.folio)
+    if (result.success && result.ticket) {
+      setTicketDetails(result.ticket)
+    }
+  }, [])
+
   // Extract URL params and fetch ticket
   useEffect(() => {
     const loadTicket = async () => {
@@ -189,6 +199,7 @@ function App() {
           ticketDetails={ticketDetails}
           authStatus={authStatus}
           authUser={authUser}
+          onPaymentComplete={reloadTicket}
         />
       </div>
     </div>
